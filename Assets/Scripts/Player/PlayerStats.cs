@@ -45,37 +45,40 @@ public class PlayerStats : CharacterStats
 
     public override void TakeDamage(int damage)
     {
-        base.TakeDamage(damage);
-        Color myColor = loadingImage.color;
-        if (health.GetCurrentValue() <= 20)
+        if (!isDead)
         {
-            myColor = new Color32(0, 0, 24, 255);
-        }
-        else if (health.GetCurrentValue() <= 40)
-        {
-            myColor = new Color32(39, 11, 40, 255);
-        }
-        else if (health.GetCurrentValue() <= 60)
-        {
-            myColor = new Color32(73, 21, 55, 255);
-        }
-        else if (health.GetCurrentValue() <= 80)
-        {
-            myColor = new Color32(89, 25, 61, 255);
-        }
-        else if (health.GetCurrentValue() <= 100)
-        {
-            myColor = new Color32(100, 29, 66, 255);
-        }
+            base.TakeDamage(damage);
+            Color myColor = loadingImage.color;
+            if (health.GetCurrentValue() <= 20)
+            {
+                myColor = new Color32(0, 0, 24, 255);
+            }
+            else if (health.GetCurrentValue() <= 40)
+            {
+                myColor = new Color32(39, 11, 40, 255);
+            }
+            else if (health.GetCurrentValue() <= 60)
+            {
+                myColor = new Color32(73, 21, 55, 255);
+            }
+            else if (health.GetCurrentValue() <= 80)
+            {
+                myColor = new Color32(89, 25, 61, 255);
+            }
+            else if (health.GetCurrentValue() <= 100)
+            {
+                myColor = new Color32(100, 29, 66, 255);
+            }
 
-        loadingImage.color = myColor;
+            loadingImage.color = myColor;
 
-        float num = 1.0f - health.GetCurrentValue() % health.GetMaxValue() * 0.01f;
-        LeanTween.value(psychadelicVolume.gameObject, psychadelicVolume.weight, num, .5f)
-            .setOnUpdate((float val) => { psychadelicVolume.weight = val;});
-        float num1 = health.GetCurrentValue() % health.GetMaxValue() * 0.01f;
-        LeanTween.value(loadingImage.gameObject, loadingImage.fillAmount, num1, .5f)
-            .setOnUpdate((float val) => { loadingImage.fillAmount = val; });
+            float num = 1.0f - health.GetCurrentValue() % health.GetMaxValue() * 0.01f;
+            LeanTween.value(psychadelicVolume.gameObject, psychadelicVolume.weight, num, .5f)
+                .setOnUpdate((float val) => { psychadelicVolume.weight = val; });
+            float num1 = health.GetCurrentValue() % health.GetMaxValue() * 0.01f;
+            LeanTween.value(loadingImage.gameObject, loadingImage.fillAmount, num1, .5f)
+                .setOnUpdate((float val) => { loadingImage.fillAmount = val; });
+        }
     }
 
     
@@ -118,8 +121,10 @@ public class PlayerStats : CharacterStats
 
     public void Continue()
     {
+        GetComponent<CharacterController>().enabled = false;
         transform.position = checkpointPos;
         health.ResetStat();
+        GetComponent<StunGun>().RecallStunGun();
         psychadelicVolume.weight = 0;
 
         Color myColor = new Color32(255, 74, 169, 255);
@@ -133,6 +138,7 @@ public class PlayerStats : CharacterStats
         LeanTween.alphaCanvas(btnsGroup, 0, 1f)
             .setOnComplete(() =>
             {
+                GetComponent<CharacterController>().enabled = true;
                 LeanTween.alphaCanvas(imagesGroup, 0, .7f);
                 image0.transform.LeanMoveLocalY(904, 1f);
                 image1.transform.LeanMoveLocalY(-1131, 1f);

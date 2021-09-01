@@ -8,7 +8,6 @@ using UnityEngine.UI;
 
 public class DialogueManager : MonoBehaviour
 {
-
     public GameObject containter_NPC;
     public GameObject container_PLAYER;
     public TextMeshProUGUI text_NPC;
@@ -87,12 +86,10 @@ public class DialogueManager : MonoBehaviour
         {
             if (!containter_NPC.activeSelf)
             {
-                LeanTween.moveLocalY(containter_NPC, 110f, 1f).setOnStart(() =>
+                text_NPC.text = data.comments[data.commentIndex];
+                LeanTween.moveLocalY(containter_NPC, 180f, 1f).setOnStart(() =>
                 {
                     containter_NPC.SetActive(true);
-                }).setOnComplete(() =>
-                {
-                    text_NPC.text = data.comments[data.commentIndex];
                 });
             }
             else

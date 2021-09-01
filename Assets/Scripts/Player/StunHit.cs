@@ -9,6 +9,7 @@ public class StunHit : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        Debug.Log(collision.collider.name, collision.gameObject);
         onEnemyHitCallback.Invoke(collision.gameObject);
     }
 }

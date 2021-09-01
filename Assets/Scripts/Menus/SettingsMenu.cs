@@ -173,6 +173,13 @@ public class SettingsMenu : MonoBehaviour
     public void LoadMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
+        LeanTween.moveLocalY(settingsPanel, 1222, 1f)
+            .setOnComplete(() =>
+            {
+                canPause = true;
+                settingsPanel.SetActive(false);
+                GamePause(false);
+            });
     }
 
     public void ApplicationExit()

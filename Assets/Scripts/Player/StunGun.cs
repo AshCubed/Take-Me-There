@@ -19,6 +19,7 @@ public class StunGun : MonoBehaviour
     private Rigidbody _stunGunRb;
     private Collider _stunGunCol;
     private bool _hasLaunched;
+    private bool _canRecall;
     private PlayerStats playerStats;
     private int layer_mask;
 
@@ -33,7 +34,7 @@ public class StunGun : MonoBehaviour
         _startPos = _stunGunHolder.transform;
         _hasLaunched = false;
         playerStats = GetComponent<PlayerStats>();
-        // _recall = false;
+        _canRecall = false;
         imgBullet.SetActive(true);
         stunGun.GetComponent<StunHit>().onEnemyHitCallback += OnStunGunHit;
         stunGun.SetActive(false);
@@ -79,34 +80,31 @@ public class StunGun : MonoBehaviour
         if (_hasLaunched == false)
         {
             RaycastHit hit;
-            //Debug.DrawRay(Camera.main.ViewportToWorldPoint(crosshair.transform.position), Camera.main.transform.forward, Color.red);
+            //Debug.DrawRay(Camera.main.ViewportToWorldPoint(crosshair.transform.position), Camera.main.transform.forward * 60f, Color.black);
             if (Physics.Raycast(Camera.main.ViewportToWorldPoint(crosshair.transform.position), 
-                Camera.main.transform.forward, out hit, Mathf.Infinity, layer_mask))
+                Camera.main.transform.forward, out hit, 60f, layer_mask))
             {
-                //if (((IList)MainManager.instance.GetEnemyTags()).Contains(hit.collider.tag))
+                if (Input.GetButtonDown("Fire1"))
                 {
-                    //Debug.Log(hit.collider.tag, hit.transform.gameObject);
-                    if (Input.GetButtonDown("Fire1"))
-                    {
-                        if(gunSpriteAnimator.GetCurrentAnimatorStateInfo(0).IsTag("spriteFire")) 
-                            gunSpriteAnimator.SetTrigger("spriteFire");
-                        stunGun.SetActive(true);
-                        AudioManager.instance.PlaySounds("GunShoot");
-                        imgBullet.SetActive(false);
-                        _hasLaunched = true;
-                        _stunGunCol.enabled = true;
-                        _stunGunRb.useGravity = true;
-                        _stunGunRb.constraints = RigidbodyConstraints.None;
-                        _stunGunRb.AddForce((hit.point - stunGun.transform.position)
-                                            * (float)(speed + _stunGunRb.velocity.magnitude));
-                        stunGun.transform.parent = null;
-                    }
+                    if (gunSpriteAnimator.GetCurrentAnimatorStateInfo(0).IsTag("spriteFire"))
+                        gunSpriteAnimator.SetTrigger("spriteFire");
+                    stunGun.SetActive(true);
+                    AudioManager.instance.PlaySounds("GunShoot");
+                    imgBullet.SetActive(false);
+                    _hasLaunched = true;
+                    _stunGunCol.enabled = true;
+                    _stunGunRb.useGravity = true;
+                    _stunGunRb.constraints = RigidbodyConstraints.None;
+                    _stunGunRb.AddForce((hit.point - stunGun.transform.position)
+                                        * (float)(speed + _stunGunRb.velocity.magnitude));
+                    stunGun.transform.parent = null;
+                    LeanTween.delayedCall(.5f, () => { _canRecall = true; });
                 }
             }
         }
         else
         {
-            if (Input.GetButtonDown("Fire1"))
+            if (Input.GetButtonDown("Fire1") && _canRecall)
             {
                 RecallStunGun();
             }
@@ -116,8 +114,12 @@ public class StunGun : MonoBehaviour
         {
             RecallStunGun();
         }
+    }
 
-        void RecallStunGun()
+    public void RecallStunGun()
+    {
+        _canRecall = false;
+        if (_hasLaunched)
         {
             if (_currentEnemy)
             {
@@ -128,10 +130,12 @@ public class StunGun : MonoBehaviour
                 _currentEnemy = null;
             }
 
+            if (!gunSpriteAnimator.GetCurrentAnimatorStateInfo(0).IsTag("spriteReload"))
+                gunSpriteAnimator.SetTrigger("spriteReload");
+
             stunGun.transform.LeanMove(_startPos.position, .2f).setOnComplete(() => {
                 //_recall = false;
-                if (!gunSpriteAnimator.GetCurrentAnimatorStateInfo(0).IsTag("spriteReload"))
-                    gunSpriteAnimator.SetTrigger("spriteReload");
+
                 stunGun.SetActive(false);
                 AudioManager.instance.PlaySounds("GunReload");
                 imgBullet.SetActive(true);
@@ -142,20 +146,6 @@ public class StunGun : MonoBehaviour
                 stunGun.transform.position = _startPos.transform.position;
                 _hasLaunched = false;
             });
-            /*stunGun.transform.position = Vector3.MoveTowards(stunGun.transform.position, _startPos.position,
-            returnSpeed * Time.deltaTime);*/
-            //hook.transform.position = Vector3.Lerp(hook.transform.position, _startPos.position, returnSpeed * Time.deltaTime);
-
-            /*var dist = Vector3.Distance(stunGun.transform.position, _startPos.position);
-            if (dist <= 0.5f || stunGun.transform.position == _startPos.position)
-            {
-                _recall = false;
-                _stunGunRb.useGravity = false;
-                _stunGunRb.constraints = RigidbodyConstraints.FreezeAll;
-                stunGun.transform.parent = _stunGunHolder.transform;
-                stunGun.transform.position = _startPos.transform.position;
-                _hasLaunched = false;
-            }*/
         }
     }
 

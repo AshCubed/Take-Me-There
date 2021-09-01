@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour
     [Tooltip("Maximum Angle X that cam can move")]
     [SerializeField] private float maximum_X = 30f;
     private float rotation_X, rotation_Y;
+    private float mouseX = 0f;
+    private float mouseY = 0f;
 
 
     // Start is called before the first frame update
@@ -50,12 +52,12 @@ public class PlayerController : MonoBehaviour
         Vector3 right = transform.TransformDirection(Vector3.right);
         // Press Left Shift to run
         bool isRunning = Input.GetKey(KeyCode.LeftShift);
-        float curSpeedX = MainManager.instance.canPlayerMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Vertical") : 0;
-        float curSpeedY = MainManager.instance.canPlayerMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Horizontal") : 0;
+        float curSpeedX = mainManager.canPlayerMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Vertical") : 0f;
+        float curSpeedY = mainManager.canPlayerMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Horizontal") : 0f;
         float movementDirectionY = moveDirection.y;
         moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
-        if (Input.GetButton("Jump") && MainManager.instance.canPlayerMove && characterController.isGrounded)
+        if (Input.GetButton("Jump") && mainManager.canPlayerMove && characterController.isGrounded)
         {
             moveDirection.y = jumpSpeed;
         }
@@ -73,29 +75,25 @@ public class PlayerController : MonoBehaviour
         }
 
         // Move the controller
-        if (MainManager.instance.canPlayerMove) characterController.Move(moveDirection * Time.deltaTime);
-
-        // Player and Camera rotation
-        /*if (MainManager.instance.canPlayerMove)
-        {
-            rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
-            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
-            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
-        }*/
+        if(characterController.enabled) characterController.Move(moveDirection * Time.deltaTime);
     }
+
 
     void HandleRotation()
     {
-        float mouseX = Input.GetAxis("Mouse X");
-        float mouseY = -Input.GetAxis("Mouse Y");
+        if (mainManager.canPlayerMove)
+        {
+            mouseX = Input.GetAxis("Mouse X");
+            mouseY = -Input.GetAxis("Mouse Y");
+        }
 
-        rotation_X += mouseY * mouseSensitivity;
-        rotation_Y += mouseX * mouseSensitivity;
+        rotation_X += mouseY * (mainManager.canPlayerMove ? mouseSensitivity : 0);
+        rotation_Y += mouseX * (mainManager.canPlayerMove ? mouseSensitivity : 0);
 
         rotation_X = ClampAngle(rotation_X, minimum_X, maximum_X);
 
         Quaternion rotation = Quaternion.Euler(rotation_X, rotation_Y, 0);
-        if (MainManager.instance.canPlayerMove) transform.rotation = rotation;
+        transform.rotation = rotation;
     }
 
     float ClampAngle(float angle, float min, float max)

@@ -8,10 +8,14 @@ public class NPC : MonoBehaviour
 {
     [SerializeField] private VIDE_Assign VIDE_Assign;
     private TextMeshProUGUI tmpNPCTalk;
+    private MeshRenderer npcMeshRenderer;
+    private Camera cam;
     private Color myColor;
     // Start is called before the first frame update
     void Start()
     {
+        cam = Camera.main;
+        npcMeshRenderer = GetComponent<MeshRenderer>();
         tmpNPCTalk = GameObject.FindGameObjectWithTag("talkNPC").GetComponent<TextMeshProUGUI>();
         myColor = tmpNPCTalk.color;
         myColor.a = 0;
@@ -20,7 +24,7 @@ public class NPC : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag(MainManager.instance.GetPlayerTag()))
+        if (other.CompareTag(MainManager.instance.GetPlayerTag()) && npcMeshRenderer.IsVisibleFrom(cam))
         {
             myColor.a = 1;
             tmpNPCTalk.color = myColor;
@@ -29,6 +33,20 @@ public class NPC : MonoBehaviour
 
     public void OnTriggerStay(Collider other)
     {
+        if (other.CompareTag(MainManager.instance.GetPlayerTag()) && npcMeshRenderer.IsVisibleFrom(cam))
+        {
+            if (MainManager.instance.canPlayerMove)
+            {
+                myColor.a = 1;
+                tmpNPCTalk.color = myColor;
+            }
+            else
+            {
+                myColor.a = 0;
+                tmpNPCTalk.color = myColor;
+            }
+        }
+
         if ((other.gameObject.tag == MainManager.instance.GetPlayerTag()) && Input.GetKey(KeyCode.E))
         {
             if (Cursor.lockState == CursorLockMode.Locked)//if cursor locked unlock it

@@ -36,7 +36,7 @@ public class CursorController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*if (Input.GetKeyDown(KeyCode.Tab))
+/*        if (Input.GetKeyDown(KeyCode.Tab))
         {
             if (cursorState == CursorState.Locked)
             {
@@ -57,26 +57,26 @@ public class CursorController : MonoBehaviour
             case CursorState.Locked:
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
-                if (MainManager.instance.player)
+/*                if (MainManager.instance.player)
                 {
                     MainManager.instance.player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
                 }
                 else
                 {
                     Debug.Log("NO PLAYER IN MAIN MANAGER");
-                }
+                }*/
                 break;
             case CursorState.Unlocked:
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
-                if (MainManager.instance.player)
+/*                if (MainManager.instance.player)
                 {
-                    MainManager.instance.player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+                    MainManager.instance.player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation;
                 }
                 else
                 {
                     Debug.Log("NO PLAYER IN MAIN MANAGER");
-                }
+                }*/
                 break;
             default:
                 break;
