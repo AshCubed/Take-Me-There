@@ -14,10 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SimpleSelectedItems:
     m_Keys:
-    - Assets/Font/veteran typewriter SDF.asset
-    - ProjectSettings/ProjectSettings.asset
+    - Assets/Scenes/WinScene.unity
     - 
-    m_Values: 010101
+    m_Values: 0101
   RevisionSummary: 
   ChangesSearchValue: 
   SelectedHistoryRevision: 
